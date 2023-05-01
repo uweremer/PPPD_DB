@@ -1,7 +1,9 @@
+de_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.5.0/de_core_news_sm-3.5.0-py3-none-any.whl
 pandas
 beautifulsoup4
 requests
 psycopg2-binary
+spacy
 sqlalchemy
 sqlalchemy-stubs
 openpyxl

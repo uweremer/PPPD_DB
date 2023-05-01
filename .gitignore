@@ -143,3 +143,7 @@ start.sh
 /output_data
 /temp
 /eval_split_files
+
+# external files
+/external_data/readme.txt
+/external_data/DE.txt

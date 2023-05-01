@@ -15,8 +15,8 @@ from src import utils
 import sys
 
 DATA_FOLDER_NAME = "ppp_bw"
-INIT = sys.argv[1] # str -> if 'init', db will be initialized from scratch
-YEAR = sys.argv[2] # int -> provide the year 
+INIT = sys.argv[1]  # str -> if 'init', db will be initialized from scratch
+YEAR = sys.argv[2]  # int -> provide the year
 
 
 def import_newsroom_legacy_data(legacy_data_path, engine):
@@ -94,7 +94,7 @@ def parse_newsroom(state, year, newsroom, legacy_data_path):
             logbook.write_entry(" already in db: " + str(file))
             print("file already in db...")
             continue
-        
+    
         if not article_file:
             try:
                 newsroom_nr, published, i, crawled = file.name.rstrip(".txt").split("_")
@@ -171,14 +171,14 @@ def import_article_legacy_data(legacy_data_path):
 
 def main():
     legacy_data_path = Path.joinpath(src.PATH, "output_data", DATA_FOLDER_NAME)
-    
+
     if INIT=="init":
         # Drops and recreates DB
         Base.metadata.drop_all(engine)
         Base.metadata.create_all(bind=engine)
-        
+
         import_newsroom_legacy_data(legacy_data_path, engine)
- 
+
     import_article_legacy_data(legacy_data_path)
     # add_final_indexes()
 

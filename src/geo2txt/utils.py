@@ -8,6 +8,9 @@ import requests
 
 import src
 
+import logging
+from sqlalchemy import exc
+
 
 def get_geonames_and_populate_db(engine):
     """
@@ -18,7 +21,9 @@ def get_geonames_and_populate_db(engine):
 
     # Download Geonames data and unzip
     if not Path(Path.joinpath(src.PATH, "external_data", "DE.txt")).is_file():
-        r = requests.get("http://download.geonames.org/export/dump/DE.zip")
+        url = "http://download.geonames.org/export/dump/DE.zip"
+        logging.debug('Downloading geonames data from %s', url)
+        r = requests.get(url)
         with open(Path.joinpath(src.PATH, "external_data", "DE.zip"), "wb") as f:
             f.write(r.content)
         with zipfile.ZipFile(
@@ -73,8 +78,10 @@ def get_geonames_and_populate_db(engine):
     }
 
     # Actual import of the file
+    geonames_file = Path.joinpath(src.PATH, "external_data", "DE.txt")
+    logging.debug('Reading geonames from file: %s', str(geonames_file))
     data = pd.read_csv(
-        Path.joinpath(src.PATH, "external_data", "DE.txt"),
+        geonames_file,
         sep="\t",
         header=None,
         usecols=cols,
@@ -87,5 +94,13 @@ def get_geonames_and_populate_db(engine):
             data[column] = data[column].fillna(-1)
         if data[column].dtypes == "str":
             data[column] = data[column].apply(lambda i: i or None)
+  
+    try:
+        logging.debug('Pushing geonames to database...')
+        data.to_sql(name="geonames", con=engine, if_exists="append", index=False)
+        logging.info('Geonames imported to database...')
+    except exc.IntegrityError as e:
+        logging.warning(e)
+        pass
 
-    data.to_sql(name="geonames", con=engine, if_exists="append", index=False)
+    logging.info("Created db table for geonames...")
