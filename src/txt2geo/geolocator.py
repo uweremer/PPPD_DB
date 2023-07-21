@@ -3,7 +3,7 @@ import logging
 import spacy
 from spacy.matcher import PhraseMatcher
 
-from src.geo2txt.models import Geoname, Related_Text
+from src.txt2geo.models import Geoname, Related_Text
 from src.models import Report
 
 
@@ -99,11 +99,11 @@ def text_toponym_lookup(text, geonames, nlp, matcher, session, report_id, **kwar
             print(topo.name, topo.admin4_code, topo.feature_code)
         print("\n*******************************\n")
 
-    logging.debug('%s toponyms extracted...', len(set(matched_topo_list)))
+    logging.debug('Report ID %s - %s toponyms extracted...', report_id, len(set(matched_topo_list)))
     return (set(matched_topo_list))
 
 
-def bulk_text_toponym_lookup(Session, start_after, end):
+def bulk_text_toponym_lookup(Session, start_after: int, end: int):
     logging.info("Starting bulk_text_toponym_lookup...")
     session = Session()
     geonames = get_geonames(session)
