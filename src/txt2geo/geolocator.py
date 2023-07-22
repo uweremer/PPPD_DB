@@ -103,12 +103,12 @@ def text_toponym_lookup(text, geonames, nlp, matcher, session, report_id, **kwar
     return (set(matched_topo_list))
 
 
-def bulk_text_toponym_lookup(Session, start_after: int, end: int):
+def bulk_text_toponym_lookup(Session, start_after: int, ends_with: int):
     logging.info("Starting bulk_text_toponym_lookup...")
     session = Session()
     geonames = get_geonames(session)
     nlp, matcher = build_phrase_matcher_pipeline(geonames)
-    reports = session.query(Report).order_by(Report.id).slice(start_after, end)
+    reports = session.query(Report).order_by(Report.id).slice(start_after, ends_with)        
     for r in reports:
         text_toponym_lookup(
             r.text_snippet,

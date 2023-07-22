@@ -33,17 +33,24 @@ def main():
         help="Set limit of batch for bulk toponym lookup - starts after this report ID.",
     )
     parser.add_argument(
-        "--end",
-        dest="END",
+        "--ends_with",
+        dest="ENDS_WITH",
         type=int,
         default=None,
         help="Set limit of batch for bulk toponym lookup - ends with this report ID.",
     )
+    parser.add_argument(
+        "--increment",
+        dest="INCREMENT",
+        type=int,
+        default=None,
+        help="Set upper limit of batch for bulk toponym lookup by providing an increment.",
+    )
 
     args = parser.parse_args()
     
-    #if args.START_AFTER or args.END is None:
-    #    parser.error('--start_after and --end are required!\n Use --help for more information.')
+    if (args.ENDS_WITH is not None) & (args.INCREMENT is not None):
+        parser.error('--ends_with and --increment may not be used simultaneusly!\n Use --help for more information.')
     
     
     numeric_level = getattr(logging, args.LOGLEVEL.upper(), None)
@@ -69,10 +76,14 @@ def main():
     if args.INITIALIZE == 0:
         logging.info('Skipping initializing db tables for geolocation.')
         
+    if args.INCREMENT:
+        ends_with = args.START_AFTER + args.INCREMENT
+    if args.ENDS_WITH:
+        ends_with = args.ENDS_WITH
         
     bulk_text_toponym_lookup(Session,
                              start_after=args.START_AFTER,
-                             end=args.END)  # takes a while
+                             ends_with=ends_with)  # takes a while
     engine.dispose()
 
 

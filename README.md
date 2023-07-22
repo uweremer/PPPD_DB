@@ -88,6 +88,29 @@ chmod +x start.sh
 
 ## Geolocation 
 
+For geolocation of the reports, run the script [`02-geolocate_reports.py`](scripts/init_db/02-geolocate_reports.py). The script expects two CLI arguments: The first specifies the start index , the second the end index.
 
 
-For geolocation of the reports, run the script [`02-geolocate_reports.py.py`](scripts/init_db/02-geolocate_reports.py.py).
+At it first run needs tu initialize the geonames tables in the database with the CLI argument `--init 1`- Here the first 6661 reports are processed.
+
+```sh
+python 02-geolocate_reports.py --init 1 --start_after 0 -- ends_with 6661 
+# Takes ~ 1h on the bwCloud (runs on 1 core)
+```
+
+For the subsequent runs, the `--init` argument can be omitted or set to `0`. To spawn the process on multiple cores, the use of the `parallel` command is advised for multicore processing (see [GNU Parallel](https://www.gnu.org/software/parallel/)). The following line passes the 8 different start indices provided after `:::` as argument to the `--start_after` flag into the placeholder `{1}`. For every started process, 65000 reports are processed (as stated with the `--increment` flag).
+
+```sh
+# sudp apt-get install parallel
+parallel python 02-geolocate_reports.py --start_after {1} --increment 65000 ::: 6661 71661 136661 201661 266661 331661 396661 461661
+```
+
+For conveinece, the script [`start_parallel_geolocation.sh`](scripts/init_db/start_parallel_geolocation.sh) is provided. It takes the number of cores `-n`, the offset for the initial batch as `-o` ad the subsequent increment as `-i` and spawns the processes accordingly. 
+
+```sh
+start_parallel_geolocation.sh -n 8 -o 6661 -i 65000
+```
+
+
+
+
